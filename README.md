@@ -1,30 +1,32 @@
-# Route League (가칭)
+# 이야기 드라이브 (가칭)
 
-같은 출퇴근길을 다니는 운전자들이 차량 연비·전비 기록으로 경로별 리그에 참여하는 Pleos Connect 차량용 앱.
-현대자동차그룹 차량용 앱 개발 공모전 출품작. 기획 문서는 [`planning/`](planning/) 참고.
+내비게이션에 목적지를 찍으면 가는 길을 미리 보고 아이 나이에 맞는 동화를 지어, 이동하는 동안 차가 들려주는 Pleos Connect 차량용 앱.
+창밖의 실제 호수·산이 이야기 속 장소가 되고, 비·밤·추위 같은 주변 환경에 따라 이야기가 바뀌며, 아이는 목소리로 주인공의 선택을 정한다.
+현대자동차그룹 차량용 앱 개발 공모전 출품작.
+
+## 문서
+| 문서 | 내용 |
+| --- | --- |
+| [`planning/story_drive_plan.md`](planning/story_drive_plan.md) | 기획서: 문제, 사용 흐름, 환경 반응, 이야기 생성·재구성, 오프라인 대비, 안전, 기술 구성, 확인 필요 사항 |
+| [`planning/pleos_dev_conditions.md`](planning/pleos_dev_conditions.md) | 개발 시 사용 조건·제한: 권한, 호출 규칙, 에러 코드, 주행 제한, 성능·심사 기준 |
+| [`planning/pleos_api_guide.md`](planning/pleos_api_guide.md) | Pleos Connect API 정리 |
 
 ## 기술 스택
-- Android Automotive (Pleos Connect), Kotlin 2.0, Jetpack Compose, Hilt, Room, WorkManager
-- Pleos Connect SDK: **Vehicle 2.3.2** (Fuel/EvBattery 효율, Gear), **NaviHelper 3.0.5** (위치·제한속도)
-- AAOS `CarPropertyManager`(PERF_VEHICLE_SPEED, INFO_FUEL_TYPE), `CarUxRestrictionsManager`
-- 서버: Supabase (`backend/`)
+- Android Automotive (Pleos Connect), Kotlin 2.0, Jetpack Compose, Hilt
+- Pleos Connect SDK: **Vehicle 2.3.2** (Gear), **NaviHelper 3.0.5** (위치)
+- AAOS `CarPropertyManager`(PERF_VEHICLE_SPEED), `CarUxRestrictionsManager`
+- 예정: TextToSpeech·SpeechToText·FusedLocation SDK(콘솔 사용 가능 여부 확인 후), Vehicle Wiper·Light, 이야기 생성 서버
 
 ## 모듈 구조
 ```
-app/                 진입점, 내비게이션, DI, 주행 중 화면 잠금, 동기화 Worker
-core/domain/         순수 Kotlin: 경로 일치·기록 자격 판정, 주간 순위(중앙값), 미션/배지  ← 단위 테스트
+app/                 진입점, DI, 주행 중 화면 잠금, 홈(차량 데이터 지원 여부)
+core/domain/         순수 Kotlin: 위치 모델, 거리 계산
 core/vehicle/        VehicleGateway 인터페이스
   ├─ pleos/          실제 구현 (Pleos SDK + AAOS)
-  └─ fake/           시나리오 재생 구현 (정상/과속/데이터 누락) — 에뮬레이터 시연용
-core/data/           Room 로컬 기록(원시 샘플 30일), Repository, RemoteSyncApi
+  └─ fake/           주행 재생 구현 — 에뮬레이터 시연용
 core/ui/             차량 디스플레이용 테마(주/야간, 큰 글씨), 공통 컴포넌트
-feature/record/      주행 자동 기록 Foreground Service + DriveRecorder
-feature/result/      주차 후 결과·미션
-feature/league/      주간 리그
-feature/passport/    경로 여권
-backend/             Supabase 스키마
 ```
-의존 방향: `app → feature → core(data, vehicle, ui) → core:domain`
+의존 방향: `app → core(vehicle, ui) → core:domain`
 
 ## 개발 환경
 - Android Studio (JDK 17), Gradle 8.10.2 (wrapper 포함), AGP 8.8.2
@@ -35,16 +37,16 @@ backend/             Supabase 스키마
 
 ## 실행 방법
 ```bash
-./gradlew :core:domain:test               # 규칙 단위 테스트
 ./gradlew installDebug                    # 실제 SDK 모드 (Pleos 에뮬레이터 Virtual Console 로 차량 상태 변경)
-./gradlew installDebug -PfakeVehicle=true # 시연 모드: 홈에서 경로 등록 → 정상/과속/데이터 누락 재생
+./gradlew installDebug -PfakeVehicle=true # 시연 모드: 홈에서 "주행 재생"
 ```
 
-## 확인 필요 (TODO)
-- SDK 효율값 단위 (`core/vehicle/EfficiencyNormalizer.kt`) — 현재 km/L, km/kWh 로 가정
-- 주행 중 백그라운드 동작 허용 범위와 foregroundServiceType (`feature/record/RecordingService.kt`)
-- FusedLocation SDK 신청 가능 시점 — 현재 위치는 NaviHelper 이벤트로 수신
-- 공식 Figma 디자인 토큰 반영 (`core/ui/theme/Theme.kt`)
+## 다음 작업 (TODO)
+- Playground 콘솔에서 TTS·STT·FusedLocation 사용 가능 여부 확인
+- 에뮬레이터에서 NaviHelper `onRouteStarted`·`onTripInfo`·`onRouteStateInfo`·`onCautionPointInfo` 값 기록 → 경로 좌표·터널 정보 제공 여부 확인
+- `VehicleGateway` 에 와이퍼·전조등·외기온, 목적지·남은 시간 추가
+- 이야기 생성 서버, 설계도·챕터 재생, 이야기 상태 저장·재구성, 오프라인 버퍼
+- 홈 화면을 아이 프로필 → 목적지 확인 → 출발 흐름으로 교체
 
 ## 제출물
 - APK: `apk/팀명_앱이름_release.apk` (release 빌드, 용량 초과 시 GitHub Releases)

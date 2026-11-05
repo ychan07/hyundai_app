@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.routeleague.core.ui"
+    namespace = "com.storydrive.core.ui"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {

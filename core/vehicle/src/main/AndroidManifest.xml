@@ -2,18 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
-        필요한 권한만 선언한다 (App Market 입점 시 사전 승인된 퍼미션만 허용).
-        Pleos Vehicle SDK: Fuel / EvBattery 효율, Gear(주차 판정)
+        필요한 권한만 선언한다 (App Market 입점 시 사전 승인된 퍼미션만 허용). 모두 조회 권한이다.
+        Pleos Vehicle SDK: Gear(주차 판정)
     -->
-    <uses-permission android:name="pleos.car.permission.CAR_ENERGY" />
     <uses-permission android:name="pleos.car.permission.CAR_POWERTRAIN" />
-    <uses-permission android:name="pleos.car.permission.CAR_INFO" />
 
-    <!-- AAOS 표준 프로퍼티: PERF_VEHICLE_SPEED, INFO_FUEL_TYPE -->
+    <!-- AAOS 표준 프로퍼티: PERF_VEHICLE_SPEED -->
     <uses-permission android:name="android.car.permission.CAR_SPEED" />
-    <uses-permission android:name="android.car.permission.CAR_INFO" />
 
-    <!-- NaviHelper: 현재 위치·제한속도 이벤트 -->
+    <!-- NaviHelper: 현재 위치 이벤트 (목적지·남은 시간 조회도 같은 권한) -->
     <uses-permission android:name="pleos.car.permission.NAVI_ROUTE" />
 
 </manifest>

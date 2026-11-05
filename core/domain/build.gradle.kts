@@ -1,4 +1,4 @@
-// 순수 Kotlin 모듈: 기록 판정·소비량 계산·순위·미션 규칙. Android 의존성 없이 단위 테스트한다.
+// 순수 Kotlin 모듈: 위치 계산 등 차량·화면과 무관한 규칙. Android 의존성 없이 단위 테스트한다.
 plugins {
     alias(libs.plugins.kotlin.jvm)
 }

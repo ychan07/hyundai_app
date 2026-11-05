@@ -22,14 +22,9 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "RouteLeague"
+rootProject.name = "StoryDrive"
 
 include(":app")
 include(":core:domain")
 include(":core:vehicle")
-include(":core:data")
 include(":core:ui")
-include(":feature:record")
-include(":feature:result")
-include(":feature:league")
-include(":feature:passport")
